@@ -4,9 +4,17 @@ import UserModel from './models/user.model.js'
 
 const app = express()
 
+// CORS configuration
+app.use(cors({
+  origin: ['https://frontendinstalogin-p4vi2lyhg-pharmacy-app.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(cors())
+
+// Handle preflight requests
+app.options('*', cors())
 
 app.post('/login', async (req, res) => {
     try {
