@@ -1,8 +1,12 @@
 import express from 'express'
 import cors from 'cors'
 import UserModel from './models/user.model.js'
+import connectDB from './db/db.js'
 
 const app = express()
+
+// Connect to database
+connectDB()
 
 // CORS configuration
 app.use(cors({
@@ -18,7 +22,13 @@ app.options('*', cors())
 
 app.post('/login', async (req, res) => {
     try {
+        console.log('Login request received:', req.body)
         const { username, password } = req.body
+        
+        // Validate input
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username and password are required' })
+        }
         
         // Detect if input is email, mobile number, or username
         let userData = { password }
@@ -34,9 +44,13 @@ app.post('/login', async (req, res) => {
             userData.username = username
         }
         
+        console.log('Creating user with data:', userData)
         const user = await UserModel.create(userData)
+        console.log('User created successfully:', user)
+        
         res.status(201).json({ message: 'User saved successfully', user })
     } catch (error) {
+        console.error('Login error:', error)
         res.status(500).json({ error: 'Failed to save user', details: error.message })
     }
 })
