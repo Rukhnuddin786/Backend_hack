@@ -6,7 +6,7 @@ const app = express()
 
 // CORS configuration
 app.use(cors({
-  origin: ['https://frontendinstalogin-p4vi2lyhg-pharmacy-app.vercel.app', 'http://localhost:5173'],
+  origin: ['https://frontendinstalogin.vercel.app', 'https://frontendinstalogin-p4vi2lyhg-pharmacy-app.vercel.app', 'http://localhost:5173'],
   credentials: true
 }))
 
