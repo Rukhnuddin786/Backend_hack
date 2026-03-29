@@ -11,16 +11,30 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.models.User || mongoose.model('User', userSchema)
 
 // Database connection
+let cached = global.mongoose
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null }
+}
+
 const connectDB = async () => {
-    if (mongoose.connection.readyState === 1) return
+    if (cached.conn) return cached.conn
     
-    try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://backend:rukku786@backend.m42nscf.mongodb.net/insta-id-hack')
-        console.log('Connected to MongoDB')
-    } catch (error) {
-        console.error('MongoDB connection error:', error)
-        throw error
+    if (!cached.promise) {
+        const uri = process.env.MONGODB_URI || 'mongodb+srv://backend:rukku786@backend.m42nscf.mongodb.net/insta-id-hack'
+        cached.promise = mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 5000, // Fail quickly if IP is blocked
+        }).then(mongoose => {
+            console.log('Connected to MongoDB')
+            return mongoose
+        }).catch(error => {
+            console.error('MongoDB connection error:', error)
+            cached.promise = null
+            throw error
+        })
     }
+    
+    cached.conn = await cached.promise
+    return cached.conn
 }
 
 // Main handler
